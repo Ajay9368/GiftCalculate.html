@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dowry Prediction Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen flex flex-col items-center py-10">
+
+  <h1 class="text-4xl font-bold text-gray-800 mb-8">💍 Dowry Prediction Tool</h1>
+
+  <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
+    
+    <!-- Male Info -->
+    <div class="bg-white rounded-2xl shadow-xl p-6">
+      <h2 class="text-2xl font-semibold text-gray-700 mb-4">👦 Male Information</h2>
+
+      <label class="block mt-2 mb-2 text-sm font-medium">Age</label>
+      <input type="number" id="maleAge" min="1" required class="w-full p-2 rounded border" />
+
+      <label class="block mt-4 mb-2 text-sm font-medium">Location</label>
+      <select id="maleLocation" class="w-full p-2 rounded border">
+        <option value="urban">Urban</option>
+        <option value="rural">Rural</option>
+      </select>
+
+      <div id="landField" class="mt-4 hidden">
+        <label class="block mb-2 text-sm font-medium">Land Owned (in Bigha)</label>
+        <input type="number" id="land" class="w-full p-2 rounded border" min="0" />
+      </div>
+
+      <label class="block mt-6 mb-2 text-sm font-medium">Occupation Type</label>
+      <div class="flex gap-4">
+        <button id="maleGovtBtn" type="button" class="flex-1 bg-green-500 hover:bg-green-600 text-white rounded px-4 py-2">Government Job</button>
+        <button id="malePrivateBtn" type="button" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">Private Job</button>
+      </div>
+
+      <!-- Govt Job specific -->
+      <div id="maleGovtJobDiv" class="mt-4 hidden">
+        <label class="block mb-2 text-sm font-medium">Select Government Job</label>
+        <select id="maleGovtJob" class="w-full p-2 rounded border">
+          <option value="">-- Select Job --</option>
+          <option value="IAS">IAS (Tier 1)</option>
+          <option value="Scientist">Scientist (Tier 1)</option>
+          <option value="Bank Officer">Bank Officer (Tier 2)</option>
+          <option value="Police">Police (Tier 3)</option>
+          <option value="Teacher">Teacher (Tier 3)</option>
+          <option value="Clerk">Clerk (Tier 3)</option>
+        </select>
+      </div>
+
+      <div id="malePrivateSalaryDiv" class="mt-4 hidden">
+        <label class="block mb-2 text-sm font-medium">Monthly Salary (₹)</label>
+        <input type="number" id="malePrivateSalary" class="w-full p-2 rounded border" min="0" />
+      </div>
+    </div>
+
+    <!-- Female Info -->
+    <div class="bg-white rounded-2xl shadow-xl p-6">
+      <h2 class="text-2xl font-semibold text-gray-700 mb-4">👧 Female Information</h2>
+
+      <label class="block mt-2 mb-2 text-sm font-medium">Age</label>
+      <input type="number" id="femaleAge" min="1" required class="w-full p-2 rounded border" />
+
+      <label class="block mt-6 mb-2 text-sm font-medium">Occupation Type</label>
+      <div class="flex gap-4">
+        <button id="femaleGovtBtn" type="button" class="flex-1 bg-green-500 hover:bg-green-600 text-white rounded px-4 py-2">Government Job</button>
+        <button id="femalePrivateBtn" type="button" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded px-4 py-2">Private Job</button>
+      </div>
+
+      <!-- Govt Job specific -->
+      <div id="femaleGovtJobDiv" class="mt-4 hidden">
+        <label class="block mb-2 text-sm font-medium">Select Government Job</label>
+        <select id="femaleGovtJob" class="w-full p-2 rounded border">
+          <option value="">-- Select Job --</option>
+          <option value="IAS">IAS (Tier 1)</option>
+          <option value="Scientist">Scientist (Tier 1)</option>
+          <option value="Bank Officer">Bank Officer (Tier 2)</option>
+          <option value="Police">Police (Tier 3)</option>
+          <option value="Teacher">Teacher (Tier 3)</option>
+          <option value="Clerk">Clerk (Tier 3)</option>
+        </select>
+      </div>
+
+      <div id="femalePrivateSalaryDiv" class="mt-4 hidden">
+        <label class="block mb-2 text-sm font-medium">Monthly Salary (₹)</label>
+        <input type="number" id="femalePrivateSalary" class="w-full p-2 rounded border" min="0" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Predict Button -->
+  <button id="predictBtn"
+    class="mt-8 px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white text-lg font-semibold rounded-xl shadow-lg transition duration-200">
+    🔮 Predict Dowry
+  </button>
+
+  <!-- Result -->
+  <div id="result"
+    class="mt-6 text-2xl font-semibold text-center text-green-700 bg-white rounded-xl px-6 py-4 shadow-md max-w-xl w-full hidden">
+  </div>
+
+  <script>
+    const maleLocation = document.getElementById('maleLocation');
+    const landField = document.getElementById('landField');
+    const landInput = document.getElementById('land');
+
+    const maleGovtBtn = document.getElementById('maleGovtBtn');
+    const malePrivateBtn = document.getElementById('malePrivateBtn');
+    const maleGovtJobDiv = document.getElementById('maleGovtJobDiv');
+    const malePrivateSalaryDiv = document.getElementById('malePrivateSalaryDiv');
+
+    const femaleGovtBtn = document.getElementById('femaleGovtBtn');
+    const femalePrivateBtn = document.getElementById('femalePrivateBtn');
+    const femaleGovtJobDiv = document.getElementById('femaleGovtJobDiv');
+    const femalePrivateSalaryDiv = document.getElementById('femalePrivateSalaryDiv');
+
+    const maleGovtJobSelect = document.getElementById('maleGovtJob');
+    const malePrivateSalaryInput = document.getElementById('malePrivateSalary');
+    const femaleGovtJobSelect = document.getElementById('femaleGovtJob');
+    const femalePrivateSalaryInput = document.getElementById('femalePrivateSalary');
+
+    const predictBtn = document.getElementById('predictBtn');
+    const resultDiv = document.getElementById('result');
+
+    let maleOccupation = null;
+    let femaleOccupation = null;
+
+    const jobTierMap = {
+      'IAS': 1,
+      'Scientist': 1,
+      'Bank Officer': 2,
+      'Police': 3,
+      'Teacher': 3,
+      'Clerk': 3
+    };
+
+    const tierRanges = {
+      1: [50000000, 100000000],
+      2: [15000000, 30000000],
+      3: [1500000, 4000000]
+    };
+
+    maleLocation.addEventListener('change', () => {
+      landField.classList.toggle('hidden', maleLocation.value !== 'rural');
+      if (maleLocation.value !== 'rural') {
+        landInput.value = '';
+      }
+    });
+
+    maleGovtBtn.addEventListener('click', () => {
+      maleOccupation = 'govt';
+      maleGovtJobDiv.classList.remove('hidden');
+      malePrivateSalaryDiv.classList.add('hidden');
+      malePrivateSalaryInput.value = '';
+    });
+    malePrivateBtn.addEventListener('click', () => {
+      maleOccupation = 'private';
+      malePrivateSalaryDiv.classList.remove('hidden');
+      maleGovtJobDiv.classList.add('hidden');
+      maleGovtJobSelect.value = '';
+    });
+
+    femaleGovtBtn.addEventListener('click', () => {
+      femaleOccupation = 'govt';
+      femaleGovtJobDiv.classList.remove('hidden');
+      femalePrivateSalaryDiv.classList.add('hidden');
+      femalePrivateSalaryInput.value = '';
+    });
+    femalePrivateBtn.addEventListener('click', () => {
+      femaleOccupation = 'private';
+      femalePrivateSalaryDiv.classList.remove('hidden');
+      femaleGovtJobDiv.classList.add('hidden');
+      femaleGovtJobSelect.value = '';
+    });
+
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function formatINR(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    predictBtn.addEventListener('click', () => {
+      resultDiv.classList.add('hidden');
+      resultDiv.innerHTML = '';
+
+      const maleAge = parseInt(document.getElementById('maleAge').value);
+      const femaleAge = parseInt(document.getElementById('femaleAge').value);
+      if (isNaN(maleAge) || maleAge <= 0) {
+        alert("Please enter a valid Male age > 0.");
+        return;
+      }
+      if (isNaN(femaleAge) || femaleAge <= 0) {
+        alert("Please enter a valid Female age > 0.");
+        return;
+      }
+
+      if (maleAge < 15) {
+        alert("Rajastan aa gya");
+        return;
+      }
+      if (femaleAge < 18 || femaleAge > maleAge + 10) {
+        alert("Mat kare lala mat kare");
+        return;
+      }
+      if (maleAge > femaleAge + 20) {
+        alert("Pesa bolta he");
+        return;
+      }
+
+      const maleLoc = maleLocation.value;
+      let land = 0;
+      if (maleLoc === 'rural') {
+        land = parseFloat(landInput.value);
+        if (isNaN(land) || land < 0) {
+          alert("Please enter valid land owned in bigha (>= 0).");
+          return;
+        }
+      }
+
+      // Calculate dowry from land
+      const landDowry = land * 40000;
+
+      // Male job dowry
+      let maleJobDowry = 0;
+      if (maleOccupation === 'govt') {
+        const job = maleGovtJobSelect.value;
+        if (!job) {
+          alert("Please select Male government job.");
+          return;
+        }
+        maleJobDowry = getRandomInt(...tierRanges[jobTierMap[job]]);
+      } else if (maleOccupation === 'private') {
+        const salary = parseInt(malePrivateSalaryInput.value);
+        if (isNaN(salary) || salary < 0) {
+          alert("Please enter valid Male private salary.");
+          return;
+        }
+        maleJobDowry = salary * 10 * 1000; // salary per 1000 means 10k dowry
+      }
+
+      // Female job dowry
+      let femaleJobDowry = 0;
+      if (femaleOccupation === 'govt') {
+        const job = femaleGovtJobSelect.value;
+        if (!job) {
+          alert("Please select Female government job.");
+          return;
+        }
+        femaleJobDowry = getRandomInt(...tierRanges[jobTierMap[job]]);
+      } else if (femaleOccupation === 'private') {
+        const salary = parseInt(femalePrivateSalaryInput.value);
+        if (isNaN(salary) || salary < 0) {
+          alert("Please enter valid Female private salary.");
+          return;
+        }
+        femaleJobDowry = salary * 10 * 1000;
+      }
+
+      // If both have same job (govt & same job OR both private), ignore job dowry
+      let jobsAreSame = false;
+      if (maleOccupation && femaleOccupation) {
+        if (maleOccupation === femaleOccupation) {
+          if (maleOccupation === 'govt') {
+            jobsAreSame = maleGovtJobSelect.value && maleGovtJobSelect.value === femaleGovtJobSelect.value;
+          } else if (maleOccupation === 'private') {
+            jobsAreSame = true; // both private, ignore job dowry
+          }
+        }
+      }
+
+      let totalJobDowry = 0;
+      if (!jobsAreSame) {
+        // If female govt job or salary > male, pop up "kuchh to Gadbad he"
+        if ((femaleOccupation === 'govt' || femaleOccupation === 'private') && femaleJobDowry > maleJobDowry) {
+          alert("Kuchh to Gadbad he");
+        }
+        totalJobDowry = maleJobDowry + femaleJobDowry;
+      }
+
+      // Total dowry calculation average + land dowry
+      const avgJobDowry = totalJobDowry / 2;
+      const totalDowry = avgJobDowry + landDowry;
+
+      resultDiv.innerHTML = `Estimated Dowry: ₹${formatINR(totalDowry.toFixed(0))}`;
+      resultDiv.classList.remove('hidden');
+    });
+  </script>
+
+</body>
+</html>
